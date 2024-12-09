@@ -1,4 +1,4 @@
-name: 'VPN Setup'
+name: 'VPN Connect using Forticlient VPN'
 description: 'Set up and connect to a VPN on multiple operating systems (Linux, macOS, Windows).'
 author: Mohamad Yusup
 branding:
