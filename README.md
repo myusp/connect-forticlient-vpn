@@ -11,9 +11,6 @@ This GitHub Action sets up and connects to a VPN on various operating systems, i
 | `vpn_username`  | VPN username                     | Yes      | N/A     |
 | `vpn_password`  | VPN password                     | Yes      | N/A     |
 
-## Outputs
-
-This action does not provide any explicit outputs. You can verify the VPN connection status from the logs.
 
 ## Example Usage
 
@@ -26,17 +23,13 @@ on:
       - main
 
 jobs:
-  vpn-setup:
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os: [ubuntu-latest, macos-latest, windows-latest]
-
+  deploy:
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
         uses: actions/checkout@v3
 
-      - name: Set up VPN
+      - name: connect vpn
         uses: myusp/connect-forticlient-vpn@main
         with:
           vpn_ip: ${{ secrets.VPN_IP }}
