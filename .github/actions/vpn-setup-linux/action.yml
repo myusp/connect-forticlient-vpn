@@ -3,18 +3,17 @@ description: "Set up VPN on Ubuntu"
 
 inputs:
   vpn_ip:
-    description: 'VPN server IP address'
+    description: "VPN server IP address"
     required: true
   vpn_port:
-    description: 'VPN server port'
+    description: "VPN server port"
     required: true
   vpn_username:
-    description: 'VPN username'
+    description: "VPN username"
     required: true
   vpn_password:
-    description: 'VPN password'
+    description: "VPN password"
     required: true
-
 
 runs:
   using: "composite"
@@ -22,10 +21,10 @@ runs:
     - name: Install dependencies
       shell: bash
       run: |
-        sudo apt-get update && sudo apt-get install -y \
-        libnss3-tools ppp libappindicator1 expect ca-certificates
+        sudo apt-get update
+        sudo apt-get install -y libnss3-tools ppp libappindicator1 expect ca-certificates
 
-    - name: Download and install FortiClient VPN
+    - name: Download and Install FortiClient VPN
       shell: bash
       run: |
         wget https://filestore.fortinet.com/forticlient/forticlient_vpn_7.4.0.1636_amd64.deb -O forticlient.deb
@@ -34,19 +33,50 @@ runs:
     - name: Create VPN Profile
       shell: bash
       run: |
-        cat <<EOF > create_vpn_profile.exp
-        #!/usr/bin/expect -f
-        spawn /opt/forticlient/fortivpn edit myvpn
-        expect -re "Type" {send -- "1\r"}
-        expect -re "Remote Gateway:" {send -- "${{ inputs.vpn_ip }}\r"}
-        expect -re "Port" {send -- "${{ inputs.vpn_port }}\r"}
-        expect -re "Authentication" {send -- "3\r"}
-        expect -re "Certificate" {send -- "3\r"}
-        expect eof
-        EOF
+        #!/usr/bin/expect
+        echo '#!/usr/bin/expect -f' > create_vpn_profile.exp
+        echo 'spawn /opt/forticlient/fortivpn edit myvpn' >> create_vpn_profile.exp
+        echo 'expect -re "Type"' >> create_vpn_profile.exp
+        echo 'send -- "1\r"' >> create_vpn_profile.exp
+        echo 'set timeout -1' >> create_vpn_profile.exp
+        echo 'expect -re "Remote Gateway:"' >> create_vpn_profile.exp
+        echo 'send -- "${{ secrets.VPN_IP }}\r"' >> create_vpn_profile.exp
+        echo 'set timeout -1' >> create_vpn_profile.exp
+        echo 'expect -re "Port"' >> create_vpn_profile.exp
+        echo 'send -- "${{ secrets.VPN_PORT }}\r"' >> create_vpn_profile.exp
+        echo 'set timeout -1' >> create_vpn_profile.exp
+        echo 'expect -re "Authentication"' >> create_vpn_profile.exp
+        echo 'send -- "3\r"' >> create_vpn_profile.exp
+        echo 'set timeout -1' >> create_vpn_profile.exp
+        echo 'expect -re "Certificate"' >> create_vpn_profile.exp
+        echo 'send -- "3\r"' >> create_vpn_profile.exp
+        echo 'set timeout -1' >> create_vpn_profile.exp
+        echo 'expect eof' >> create_vpn_profile.exp
         chmod +x create_vpn_profile.exp
         ./create_vpn_profile.exp
 
+    - name: List VPN Script
+      shell: bash      
+      run: |
+        /opt/forticlient/fortivpn list
+        /opt/forticlient/fortivpn view myvpn
+
+    - name: Create VPN Connect Script
+      shell: bash
+      run: |
+        echo '#!/usr/bin/expect -f' > vpnconnect.exp
+        echo 'spawn /opt/forticlient/fortivpn connect myvpn --user=${{ secrets.VPN_USERNAME }} --password' >> vpnconnect.exp
+        echo 'expect -exact "password:"' >> vpnconnect.exp
+        echo 'send -- "${{ secrets.VPN_PASS }}\r"' >> vpnconnect.exp 
+        echo 'set timeout -1' >> vpnconnect.exp
+        echo 'expect -re "Confirm "' >> vpnconnect.exp
+        echo 'send -- "y\r"' >> vpnconnect.exp
+        echo 'set timeout -1' >> vpnconnect.exp
+        echo 'expect eof' >> vpnconnect.exp
+        chmod +x vpnconnect.exp
+        ./vpnconnect.exp
+
     - name: VPN Status
       shell: bash
-      run: /opt/forticlient/fortivpn status
+      run: |
+        /opt/forticlient/fortivpn status
