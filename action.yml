@@ -22,6 +22,8 @@ inputs:
 runs:
   using: 'composite'
   steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v3
     - name: Run Linux VPN Setup
       if: runner.os == 'Linux'
       uses: ./.github/actions/vpn-setup-linux
