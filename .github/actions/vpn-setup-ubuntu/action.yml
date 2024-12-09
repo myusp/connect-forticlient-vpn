@@ -1,0 +1,52 @@
+name: "VPN Setup for Linux"
+description: "Set up VPN on Ubuntu"
+
+inputs:
+  vpn_ip:
+    description: 'VPN server IP address'
+    required: true
+  vpn_port:
+    description: 'VPN server port'
+    required: true
+  vpn_username:
+    description: 'VPN username'
+    required: true
+  vpn_password:
+    description: 'VPN password'
+    required: true
+
+
+runs:
+  using: "composite"
+  steps:
+    - name: Install dependencies
+      shell: bash
+      run: |
+        sudo apt-get update && sudo apt-get install -y \
+        libnss3-tools ppp libappindicator1 expect ca-certificates
+
+    - name: Download and install FortiClient VPN
+      shell: bash
+      run: |
+        wget https://filestore.fortinet.com/forticlient/forticlient_vpn_7.4.0.1636_amd64.deb -O forticlient.deb
+        sudo dpkg -i forticlient.deb
+
+    - name: Create VPN Profile
+      shell: bash
+      run: |
+        cat <<EOF > create_vpn_profile.exp
+        #!/usr/bin/expect -f
+        spawn /opt/forticlient/fortivpn edit myvpn
+        expect -re "Type" {send -- "1\r"}
+        expect -re "Remote Gateway:" {send -- "${{ inputs.vpn_ip }}\r"}
+        expect -re "Port" {send -- "${{ inputs.vpn_port }}\r"}
+        expect -re "Authentication" {send -- "3\r"}
+        expect -re "Certificate" {send -- "3\r"}
+        expect eof
+        EOF
+        chmod +x create_vpn_profile.exp
+        ./create_vpn_profile.exp
+
+    - name: VPN Status
+      shell: bash
+      run: /opt/forticlient/fortivpn status

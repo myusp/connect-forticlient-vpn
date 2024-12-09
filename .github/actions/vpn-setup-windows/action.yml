@@ -1,0 +1,45 @@
+name: 'VPN Setup for Windows'
+description: 'Set up VPN on Windows'
+
+inputs:
+  vpn_ip:
+    description: 'VPN server IP address'
+    required: true
+  vpn_port:
+    description: 'VPN server port'
+    required: true
+  vpn_username:
+    description: 'VPN username'
+    required: true
+  vpn_password:
+    description: 'VPN password'
+    required: true
+
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Install FortiClient VPN
+      shell: pwsh
+      run: |
+        # Replace with actual URL for Windows FortiClient package
+        Invoke-WebRequest -Uri https://example.com/FortiClientSetup.exe -OutFile FortiClientSetup.exe
+        Start-Process -FilePath .\FortiClientSetup.exe -ArgumentList "/quiet" -Wait
+
+    - name: Configure VPN
+      shell: pwsh
+      run: |
+        # Add PowerShell script logic to configure the VPN
+        Write-Host "Configuring VPN..."
+
+    - name: Connect to VPN
+      shell: pwsh
+      run: |
+        Write-Host "Connecting to VPN..."
+        # Add commands to initiate the VPN connection
+
+    - name: VPN Status
+      shell: pwsh
+      run: |
+        Write-Host "Checking VPN status..."
+        # Add commands to check VPN status

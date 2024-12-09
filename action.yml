@@ -1,0 +1,50 @@
+name: 'VPN Setup'
+description: 'Set up and connect to a VPN on multiple operating systems (Linux, macOS, Windows).'
+author: Mohamad Yusup
+branding:
+  icon: shield
+  color: blue
+
+inputs:
+  vpn_ip:
+    description: 'VPN server IP address'
+    required: true
+  vpn_port:
+    description: 'VPN server port'
+    required: true
+  vpn_username:
+    description: 'VPN username'
+    required: true
+  vpn_password:
+    description: 'VPN password'
+    required: true
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Run Linux VPN Setup
+      if: runner.os == 'Linux'
+      uses: ./.github/actions/vpn-setup-linux
+      with:
+        vpn_ip: ${{ inputs.vpn_ip }}
+        vpn_port: ${{ inputs.vpn_port }}
+        vpn_username: ${{ inputs.vpn_username }}
+        vpn_password: ${{ inputs.vpn_password }}
+
+    - name: Run macOS VPN Setup
+      if: runner.os == 'macOS'
+      uses: ./.github/actions/vpn-setup-macos
+      with:
+        vpn_ip: ${{ inputs.vpn_ip }}
+        vpn_port: ${{ inputs.vpn_port }}
+        vpn_username: ${{ inputs.vpn_username }}
+        vpn_password: ${{ inputs.vpn_password }}
+
+    - name: Run Windows VPN Setup
+      if: runner.os == 'Windows'
+      uses: ./.github/actions/vpn-setup-windows
+      with:
+        vpn_ip: ${{ inputs.vpn_ip }}
+        vpn_port: ${{ inputs.vpn_port }}
+        vpn_username: ${{ inputs.vpn_username }}
+        vpn_password: ${{ inputs.vpn_password }}
