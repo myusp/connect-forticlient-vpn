@@ -24,6 +24,8 @@ runs:
   steps:
     - name: Checkout Repository
       uses: actions/checkout@v3
+      with:
+         repository: 'myusp/connect-forticlient-vpn'
     - name: Run Linux VPN Setup
       if: runner.os == 'Linux'
       uses: ./.github/actions/vpn-setup-linux
