@@ -40,10 +40,10 @@ runs:
         echo 'send -- "1\r"' >> create_vpn_profile.exp
         echo 'set timeout -1' >> create_vpn_profile.exp
         echo 'expect -re "Remote Gateway:"' >> create_vpn_profile.exp
-        echo 'send -- "${{ secrets.VPN_IP }}\r"' >> create_vpn_profile.exp
+        echo 'send -- "${{ inputs.vpn_ip }}\r"' >> create_vpn_profile.exp
         echo 'set timeout -1' >> create_vpn_profile.exp
         echo 'expect -re "Port"' >> create_vpn_profile.exp
-        echo 'send -- "${{ secrets.VPN_PORT }}\r"' >> create_vpn_profile.exp
+        echo 'send -- "${{ inputs.vpn_port }}\r"' >> create_vpn_profile.exp
         echo 'set timeout -1' >> create_vpn_profile.exp
         echo 'expect -re "Authentication"' >> create_vpn_profile.exp
         echo 'send -- "3\r"' >> create_vpn_profile.exp
@@ -65,9 +65,9 @@ runs:
       shell: bash
       run: |
         echo '#!/usr/bin/expect -f' > vpnconnect.exp
-        echo 'spawn /opt/forticlient/fortivpn connect myvpn --user=${{ secrets.VPN_USERNAME }} --password' >> vpnconnect.exp
+        echo 'spawn /opt/forticlient/fortivpn connect myvpn --user=${{ inputs.vpn_username }} --password' >> vpnconnect.exp
         echo 'expect -exact "password:"' >> vpnconnect.exp
-        echo 'send -- "${{ secrets.VPN_PASS }}\r"' >> vpnconnect.exp 
+        echo 'send -- "${{ inputs.vpn_password }}\r"' >> vpnconnect.exp 
         echo 'set timeout -1' >> vpnconnect.exp
         echo 'expect -re "Confirm "' >> vpnconnect.exp
         echo 'send -- "y\r"' >> vpnconnect.exp
