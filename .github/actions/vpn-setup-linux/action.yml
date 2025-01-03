@@ -18,11 +18,27 @@ inputs:
 runs:
   using: "composite"
   steps:
+    - name: Cache APT packages
+      uses: actions/cache@v3
+      with:
+        path: /var/cache/apt
+        key: ${{ runner.os }}-apt-${{ hashFiles('**/action.yml') }}
+        restore-keys: |
+          ${{ runner.os }}-apt-
+
     - name: Install dependencies
       shell: bash
       run: |
         sudo apt-get update
         sudo apt-get install -y libnss3-tools ppp libappindicator1 expect ca-certificates
+
+    - name: Cache FortiClient VPN
+      uses: actions/cache@v3
+      with:
+        path: ~/.forticlient
+        key: ${{ runner.os }}-forticlient-${{ hashFiles('**/action.yml') }}
+        restore-keys: |
+          ${{ runner.os }}-forticlient-
 
     - name: Download and Install FortiClient VPN
       shell: bash
